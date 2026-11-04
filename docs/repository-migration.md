@@ -51,8 +51,8 @@ một lượt cài sạch mới.
 | `node --check app/static/app.js` | Cú pháp JavaScript đạt. |
 
 Browser suite khởi động Uvicorn và SQLite thử riêng, kiểm tra tìm kiếm tiếng Việt,
-trích dẫn/trang nguồn/export, upload/ghim/xóa, render HTML như văn bản, điều khiển
-bàn phím và overflow mobile. Ảnh desktop dùng viewport 1440 × 1050, mobile
+trích dẫn/trang nguồn/export, upload/ghim/xóa, render HTML như văn bản, trạng thái
+lỗi/rỗng và overflow mobile. Ảnh desktop dùng viewport 1440 × 1050, mobile
 390 × 844; ảnh full-page có thể cao hơn viewport.
 
 Có một cảnh báo deprecation từ Starlette về TestClient/httpx. Kết quả test đạt
