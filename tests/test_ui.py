@@ -92,8 +92,9 @@ def test_desktop_search_citation_export_and_screenshot(browser, server, tmp_path
         page.get_by_role("button", name="Xuất ghi chú").click()
     target = tmp_path / "notes.md"
     download.value.save_as(target)
-    assert "Remote-work.md" in target.read_text()
-    assert "Trang 1" in target.read_text()
+    exported_text = target.read_text(encoding="utf-8")
+    assert "Remote-work.md" in exported_text
+    assert "Trang 1" in exported_text
     assert errors == []
     context.close()
 

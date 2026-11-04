@@ -11,6 +11,10 @@ Python 3.12 · FastAPI · SQLite FTS5 · Vanilla JavaScript
 
 [Tính năng](#tính-năng) · [Chạy thử](#chạy-thử) · [Kiểm thử](#kiểm-thử) · [Nguồn gốc](#nguồn-gốc)
 
+[Mã nguồn](https://github.com/nguyenhonggiang2407/YangDocs) ·
+[CI](https://github.com/nguyenhonggiang2407/YangDocs/actions/workflows/ci.yml) ·
+[Lịch sử tách repository](docs/repository-migration.md)
+
 </div>
 
 ![Giao diện thư viện YangDocs trên máy tính](docs/screenshots/desktop.png)
@@ -35,7 +39,7 @@ không gửi nội dung tài liệu đến dịch vụ AI.** Văn bản được
 ### Python
 
 ```bash
-git clone --branch yangdocs-preview --single-branch https://github.com/nguyenhonggiang2407/DTDD.git YangDocs
+git clone https://github.com/nguyenhonggiang2407/YangDocs.git
 cd YangDocs
 python -m venv .venv
 source .venv/bin/activate
@@ -47,9 +51,10 @@ uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 Mở <http://127.0.0.1:8000>, chọn **Thử bộ tài liệu mẫu**, rồi tìm
 `lam viec tu xa` hoặc `backend`. Không cần đăng ký tài khoản hay cấu hình dịch vụ khác.
 
-Mã YangDocs hiện được lưu ở nhánh độc lập `yangdocs-preview` của repo DTDD.
-Nhánh `main` của repo tiếp tục chứa dự án YangCareer. Có thể chuyển nguyên
-nội dung nhánh này sang repo YangDocs riêng khi repo mới được tạo.
+YangDocs có repository riêng, nhánh mặc định `main`. Mã và lịch sử trước khi tách
+được giữ từ nhánh [`yangdocs-preview` của DTDD](https://github.com/nguyenhonggiang2407/DTDD/tree/yangdocs-preview).
+Nhánh gốc được giữ để đối chiếu; [bản ghi migration](docs/repository-migration.md)
+nêu commit nguồn và các kiểm tra đã thực hiện. Chưa công bố live demo của repo này.
 
 ### Docker
 
@@ -122,7 +127,8 @@ trùng, PDF mã hóa/ảnh quét, số trang thực của PDF nhiều trang, tì
 lọc tài liệu ghim, export, giới hạn tài liệu, phiên hết hạn và xóa khỏi FTS.
 Browser tests thực hiện upload → ghim → xem nguồn → hủy/xác nhận xóa, tìm kiếm
 → đọc trích dẫn → tải Markdown, render nội dung chứa HTML dưới dạng văn bản,
-kiểm tra overflow mobile và chụp giao diện thật. CI tạo ảnh bên dưới sau khi kiểm thử đạt.
+kiểm tra overflow mobile và chụp giao diện thật. Các ảnh bên dưới được tạo bởi
+browser tests; CI chạy lại cùng luồng và lưu artifact `yangdocs-screenshots`.
 
 <details>
 <summary>Ảnh tìm kiếm và giao diện mobile</summary>
