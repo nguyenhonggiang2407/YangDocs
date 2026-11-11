@@ -4,6 +4,7 @@ const $ = (selector) => document.querySelector(selector);
 const state = { csrf: "", documents: [], favorites: false, results: null, preview: null, deleting: null };
 let toastTimer;
 let searchSequence = 0;
+let previewSequence = 0;
 
 function node(tag, className, text) {
   const element = document.createElement(tag);
@@ -194,15 +195,36 @@ async function search(query) {
 }
 
 async function preview(documentId, page) {
-  const data = await api(`/api/documents/${documentId}/pages/${page}`);
+  const dialog = $("#preview-dialog");
+  const wasOpen = dialog.open;
+  const sequence = ++previewSequence;
+  const isCurrent = () => sequence === previewSequence && (!wasOpen || dialog.open);
+  let data;
+  try {
+    data = await api(`/api/documents/${documentId}/pages/${page}`);
+  } catch (err) {
+    if (isCurrent()) throw err;
+    return;
+  }
+  if (!isCurrent()) return;
+
   state.preview = data;
+  const text = $("#preview-text");
+  const previous = $("#previous-page");
+  const next = $("#next-page");
   $("#preview-title").textContent = data.document.name;
-  $("#preview-text").textContent = data.text || "Trang này không có văn bản có thể trích xuất.";
+  text.textContent = data.text || "Trang này không có văn bản có thể trích xuất.";
   $("#preview-page-label").textContent = `Trang ${data.number} / ${data.document.page_count}`;
-  $("#previous-page").disabled = data.number <= 1;
-  $("#next-page").disabled = data.number >= data.document.page_count;
-  if (!$("#preview-dialog").open) $("#preview-dialog").showModal();
-  $("#preview-text").scrollTop = 0;
+  const focused = document.activeElement;
+  previous.disabled = data.number <= 1;
+  next.disabled = data.number >= data.document.page_count;
+  if (!dialog.open) {
+    dialog.showModal();
+    text.focus({ preventScroll: true });
+  } else if ((focused === previous && previous.disabled) || (focused === next && next.disabled)) {
+    text.focus({ preventScroll: true });
+  }
+  text.scrollTop = 0;
 }
 
 async function copyText(text) {
