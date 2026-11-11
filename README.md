@@ -51,6 +51,10 @@ uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 Mở <http://127.0.0.1:8000>, chọn **Thử bộ tài liệu mẫu**, rồi tìm
 `lam viec tu xa` hoặc `backend`. Không cần đăng ký tài khoản hay cấu hình dịch vụ khác.
 
+Trong kết quả tìm kiếm, dùng Tab để chọn **Đọc trong tài liệu** và Enter để mở.
+Tiêu điểm chuyển vào văn bản trang nguồn để bạn đọc và cuộn bằng bàn phím.
+Nhấn Escape để quay về nút trích dẫn, kể cả khi một trang khác đang tải.
+
 YangDocs có repository riêng, nhánh mặc định `main`. Mã và lịch sử trước khi tách
 được giữ từ nhánh [`yangdocs-preview` của DTDD](https://github.com/nguyenhonggiang2407/DTDD/tree/yangdocs-preview).
 Nhánh gốc được giữ để đối chiếu; [bản ghi migration](docs/repository-migration.md)

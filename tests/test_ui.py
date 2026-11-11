@@ -10,6 +10,7 @@ from pathlib import Path
 import httpx
 import pytest
 from playwright.sync_api import expect, sync_playwright
+from test_documents import pdf_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 SCREENSHOTS = ROOT / "docs/screenshots"
@@ -59,7 +60,7 @@ def server(tmp_path_factory):
 @pytest.fixture(scope="module")
 def browser():
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
+        browser = playwright.chromium.launch(channel=os.getenv("PLAYWRIGHT_CHANNEL"))
         yield browser
         browser.close()
 
@@ -173,4 +174,49 @@ def test_ui_error_empty_query_and_filter(browser, server):
     page.get_by_role("button", name="Thêm vào thư viện", exact=False).click()
     expect(page.locator("#upload-message")).to_contain_text("không phải PDF hợp lệ")
     assert page.locator(".document-card").count() == 3
+    context.close()
+
+
+def test_keyboard_source_preview_ignores_a_page_that_arrives_after_escape(browser, server):
+    context = browser.new_context(viewport={"width": 390, "height": 844})
+    page = context.new_page()
+    page.goto(server)
+    expect(page.get_by_text("Bắt đầu từ một tài liệu.", exact=True)).to_be_visible()
+    page.get_by_role("button", name="Thêm tài liệu", exact=True).click()
+    page.locator("#file-input").set_input_files(
+        {
+            "name": "Handbook.pdf",
+            "mimeType": "application/pdf",
+            "buffer": pdf_bytes("Orchid project overview", "Second page with timeline"),
+        }
+    )
+    page.get_by_role("button", name="Thêm vào thư viện").click()
+    expect(page.locator("#upload-dialog")).not_to_be_visible()
+    page.get_by_label("Từ khóa tìm kiếm").fill("Orchid")
+    page.get_by_label("Từ khóa tìm kiếm").press("Enter")
+    source = page.get_by_role("button", name="Mở nguồn Handbook.pdf trang 1")
+    source.focus()
+    source.press("Enter")
+    dialog = page.get_by_role("dialog", name="Handbook.pdf")
+    expect(dialog).to_be_visible()
+    source_text_focused = page.locator("#preview-text").evaluate(
+        "element => document.activeElement === element"
+    )
+
+    delayed_pages = []
+    page.route("**/api/documents/*/pages/2", lambda route: delayed_pages.append(route))
+    with page.expect_request("**/api/documents/*/pages/2"):
+        page.get_by_role("button", name="Trang sau").press("Enter")
+    page.keyboard.press("Escape")
+    expect(dialog).not_to_be_visible()
+    expect(source).to_be_focused()
+    with page.expect_response("**/api/documents/*/pages/2") as response:
+        delayed_pages[0].continue_()
+    response.value.finished()
+    page.evaluate(
+        "new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))"
+    )
+    expect(dialog).not_to_be_visible()
+    expect(source).to_be_focused()
+    assert source_text_focused
     context.close()
